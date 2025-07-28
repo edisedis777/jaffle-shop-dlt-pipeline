@@ -50,11 +50,4 @@ info = pipeline.run(source)
 # Print results
 print(info)
 
-# Optional: Show some data
-if info.loads_ids:
-    print("First few orders loaded (with order_total <= 500):")
-    import duckdb
-    conn = duckdb.connect("jaffle_shop_incremental.duckdb")
-    result = conn.execute("SELECT ordered_at, order_total FROM orders ORDER BY ordered_at LIMIT 5").fetchall()
-    for row in result:
-        print(row)
+
