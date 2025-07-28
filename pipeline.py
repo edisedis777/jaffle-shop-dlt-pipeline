@@ -27,15 +27,24 @@ def jaffle_shop_source_naive():
             response = client.get("/customers", params={"page": page, "limit": 100})
             data = response.json()
             
-            if not data.get("data"):
+            # Handle both list and dict response formats
+            if isinstance(data, list):
+                items = data
+            else:
+                items = data.get("data", [])
+            
+            if not items:
                 break
                 
             # Yield single rows (inefficient)
-            for item in data["data"]:
+            for item in items:
                 yield item
             
             page += 1
-            if page > data.get("total_pages", 1):
+            # For list responses, we'll break when we get empty results
+            if isinstance(data, list) and len(data) < 100:
+                break
+            elif isinstance(data, dict) and page > data.get("total_pages", 1):
                 break
     
     @dlt.resource(name="orders", write_disposition="replace")  
@@ -47,15 +56,24 @@ def jaffle_shop_source_naive():
             response = client.get("/orders", params={"page": page, "limit": 100})
             data = response.json()
             
-            if not data.get("data"):
+            # Handle both list and dict response formats
+            if isinstance(data, list):
+                items = data
+            else:
+                items = data.get("data", [])
+            
+            if not items:
                 break
                 
             # Yield single rows (inefficient)
-            for item in data["data"]:
+            for item in items:
                 yield item
             
             page += 1
-            if page > data.get("total_pages", 1):
+            # For list responses, we'll break when we get empty results
+            if isinstance(data, list) and len(data) < 100:
+                break
+            elif isinstance(data, dict) and page > data.get("total_pages", 1):
                 break
 
     @dlt.resource(name="products", write_disposition="replace")
@@ -67,15 +85,24 @@ def jaffle_shop_source_naive():
             response = client.get("/products", params={"page": page, "limit": 100})
             data = response.json()
             
-            if not data.get("data"):
+            # Handle both list and dict response formats
+            if isinstance(data, list):
+                items = data
+            else:
+                items = data.get("data", [])
+            
+            if not items:
                 break
                 
             # Yield single rows (inefficient) 
-            for item in data["data"]:
+            for item in items:
                 yield item
             
             page += 1
-            if page > data.get("total_pages", 1):
+            # For list responses, we'll break when we get empty results
+            if isinstance(data, list) and len(data) < 100:
+                break
+            elif isinstance(data, dict) and page > data.get("total_pages", 1):
                 break
 
     return [get_customers, get_orders, get_products]
@@ -102,14 +129,23 @@ def jaffle_shop_source_optimized():
             response = client.get("/customers", params={"page": page, "limit": 1000})  # Larger chunks
             data = response.json()
             
-            if not data.get("data"):
+            # Handle both list and dict response formats
+            if isinstance(data, list):
+                items = data
+            else:
+                items = data.get("data", [])
+            
+            if not items:
                 break
                 
             # Yield entire pages/chunks (efficient)
-            yield data["data"]
+            yield items
             
             page += 1
-            if page > data.get("total_pages", 1):
+            # For list responses, we'll break when we get empty results
+            if isinstance(data, list) and len(data) < 1000:
+                break
+            elif isinstance(data, dict) and page > data.get("total_pages", 1):
                 break
     
     @dlt.resource(
@@ -130,14 +166,23 @@ def jaffle_shop_source_optimized():
             response = client.get("/orders", params={"page": page, "limit": 1000})  # Larger chunks
             data = response.json()
             
-            if not data.get("data"):
+            # Handle both list and dict response formats
+            if isinstance(data, list):
+                items = data
+            else:
+                items = data.get("data", [])
+            
+            if not items:
                 break
                 
             # Yield entire pages/chunks (efficient)
-            yield data["data"]
+            yield items
             
             page += 1
-            if page > data.get("total_pages", 1):
+            # For list responses, we'll break when we get empty results
+            if isinstance(data, list) and len(data) < 1000:
+                break
+            elif isinstance(data, dict) and page > data.get("total_pages", 1):
                 break
 
     @dlt.resource(
@@ -158,14 +203,23 @@ def jaffle_shop_source_optimized():
             response = client.get("/products", params={"page": page, "limit": 1000})  # Larger chunks
             data = response.json()
             
-            if not data.get("data"):
+            # Handle both list and dict response formats
+            if isinstance(data, list):
+                items = data
+            else:
+                items = data.get("data", [])
+            
+            if not items:
                 break
                 
             # Yield entire pages/chunks (efficient)
-            yield data["data"]
+            yield items
             
             page += 1
-            if page > data.get("total_pages", 1):
+            # For list responses, we'll break when we get empty results
+            if isinstance(data, list) and len(data) < 1000:
+                break
+            elif isinstance(data, dict) and page > data.get("total_pages", 1):
                 break
 
     return [get_customers, get_orders, get_products]
@@ -252,16 +306,16 @@ def run_performance_comparison():
         if (customers_count == customers_count_opt and 
             orders_count == orders_count_opt and 
             products_count == products_count_opt):
-            print("Data consistency verified, both versions loaded same amount of data")
+            print("Data consistency verified")
         else:
-            print("Data mismatch detected!")
+            print("Data mismatch detected")
             
     except Exception as e:
         print(f"Could not verify data: {e}")
 
 def main():
     """Main execution function"""
-    print("Jaffle Shop dlt Pipeline, Performance Optimization")
+    print("Jaffle Shop dlt Pipeline - Performance Optimization Demo")
     print("=" * 60)
     
     # Run performance comparison
