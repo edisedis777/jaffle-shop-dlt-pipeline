@@ -10,6 +10,6 @@ This repo contains a `dlt` pipeline that extracts data from the public Jaffle Sh
 
 ## Setup
 
-1. Fork this repo
+1. Fork repo
 2. Customize schedule in `.github/workflows/run_pipeline.yml`
-3. Watch it run daily!
+3. Watch it run!
